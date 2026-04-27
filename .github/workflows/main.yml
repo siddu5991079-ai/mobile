@@ -1,0 +1,57 @@
+name: Mobile App Automation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Taake aap jab chahein isay manually Github par button daba kar bhi chala sakein
+
+jobs:
+  android-test:
+    runs-on: macos-latest # macOS par Android emulator zyada stable aur fast chalta hai
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          lfs: true # BOHAT ZAROORI: Ye base.apk ki 82MB wali asli file download karega
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Appium and Dependencies
+        run: |
+          npm i -g appium
+          appium driver install uiautomator2
+          pip install Appium-Python-Client
+          appium & # Appium server ko background mein start karna
+
+      - name: Run Android Emulator and Execute Script
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            # 1. Apne main folder mein enter hona jahan apks aur code para hai
+            cd SportsAppAuto
+            
+            echo "Checking APK files..."
+            ls -lh apks/
+            
+            echo "Installing Split APKs..."
+            # 2. Chaaron APK files ko ek sath emulator mein install karna
+            adb install-multiple apks/base.apk apks/split_config.arm64_v8a.apk apks/split_config.en.apk apks/split_config.xxhdpi.apk
+            
+            echo "Running Python Script..."
+            # 3. Python script chalana jo app open karke screenshot legi
+            python automation.py
+
+      - name: Upload Screenshot Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: App-Screenshots
+          # Kyunke script SportsAppAuto folder mein chali hai, screenshot wahan se uthana hai
+          path: SportsAppAuto/*.png
