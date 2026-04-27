@@ -13,7 +13,9 @@ options.app_package = 'com.asadapps.live.ten.sports'
 # TODO: Yahan App ki Main Activity dalni hogi (abhi farzi dali hai)
 # options.app_activity = 'com.asadapps.live.ten.sports.MainActivity' 
 # Purani line ki jagah yeh exact line likhein:
-options.app_activity = 'com.asadapps.live.ten.sports.ui.activities.MainActivity'
+# options.app_activity = 'com.asadapps.live.ten.sports.ui.activities.MainActivity'
+# Is line ko update karein
+options.app_activity = 'com.asadapps.live.ten.sports.ui.activities.EntryActivity'
 
 print("App open kar raha hoon...")
 driver = webdriver.Remote('http://127.0.0.1:4723', options=options)
