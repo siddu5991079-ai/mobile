@@ -1,0 +1,52 @@
+name: Mobile App Automation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Taake aap manually bhi run kar saken
+
+jobs:
+  android-test:
+    runs-on: macos-latest # macOS par emulator fast chalta hai
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          lfs: true # ZAROORI: LFS files download karne ke liye
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Appium and Dependencies
+        run: |
+          npm i -g appium
+          appium driver install uiautomator2
+          pip install Appium-Python-Client
+          appium & # Appium server background mein start karein
+
+      - name: Run Android Emulator and Execute Script
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            echo "Checking APK files..."
+            ls -lh apks/
+            
+            echo "Installing Split APKs..."
+            # Saari files ko ek saath install karna
+            adb install-multiple apks/base.apk apks/split_config.arm64_v8a.apk apks/split_config.en.apk apks/split_config.xxhdpi.apk
+            
+            echo "Running Python Script..."
+            python automation.py
+
+      - name: Upload Screenshot Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: App-Screenshots
+          path: ./*.png
