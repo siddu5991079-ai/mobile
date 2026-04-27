@@ -7,16 +7,14 @@ on:
 
 jobs:
   android-test:
-    # Yahan humne macOS ko hata kar Ubuntu laga diya hai (Fauran start hoga)
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest # Fauran start hone ke liye Ubuntu server
     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          lfs: true 
+          lfs: true # Git LFS se badi base.apk download karne ke liye
 
-      # Ubuntu par KVM (Hardware Acceleration) enable karna zaroori hota hai emulator ke liye
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -33,7 +31,7 @@ jobs:
           npm i -g appium
           appium driver install uiautomator2
           pip install Appium-Python-Client
-          appium & 
+          appium & # Appium server ko background mein start karna
 
       - name: Run Android Emulator and Execute Script
         uses: reactivecircus/android-emulator-runner@v2
@@ -44,16 +42,17 @@ jobs:
           profile: Nexus 6
           disable-animations: true
           script: |
-            cd SportsAppAuto
-            
             echo "Checking APK files..."
-            ls -lh apks/
+            # Pura path diya gaya hai taake folder easily mil jaye
+            ls -lh SportsAppAuto/apks/
             
             echo "Installing Split APKs..."
-            adb install-multiple apks/base.apk apks/split_config.arm64_v8a.apk apks/split_config.en.apk apks/split_config.xxhdpi.apk
+            # Har file ke aage SportsAppAuto/ laga hai taake error na aaye
+            adb install-multiple SportsAppAuto/apks/base.apk SportsAppAuto/apks/split_config.arm64_v8a.apk SportsAppAuto/apks/split_config.en.apk SportsAppAuto/apks/split_config.xxhdpi.apk
             
             echo "Running Python Script..."
-            python automation.py
+            # cd aur python ko ek hi line mein jor diya hai
+            cd SportsAppAuto && python automation.py
 
       - name: Upload Screenshot Artifact
         uses: actions/upload-artifact@v4
