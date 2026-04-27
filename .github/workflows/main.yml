@@ -7,7 +7,8 @@ on:
 
 jobs:
   android-test:
-    runs-on: macos-latest # macOS par Android emulator zyada stable aur fast chalta hai
+    # runs-on: macos-latest # macOS par Android emulator zyada stable aur fast chalta hai
+    macos-13 # <--- macOS 13 (Intel based server) use karein
     
     steps:
       - name: Checkout Code
