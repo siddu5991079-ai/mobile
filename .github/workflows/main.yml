@@ -1,3 +1,5 @@
+
+
 name: Mobile App Automation
 
 on:
@@ -7,7 +9,7 @@ on:
 
 jobs:
   android-test:
-    runs-on: ubuntu-latest # Wapas Ubuntu par taake fast aur KVM virtualization miley
+    runs-on: ubuntu-latest # Fast boot aur KVM hardware acceleration ke liye
     
     steps:
       - name: Checkout Code
@@ -36,9 +38,9 @@ jobs:
       - name: Run Android Emulator and Execute Script
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30 # <--- API 30 (Android 11) jisme ARM to x86 translator mojood hai
+          api-level: 30 # ARM to x86 Translator activate karne ke liye
           target: google_apis
-          arch: x86_64 # <--- Server ka native architecture taake fast boot ho
+          arch: x86_64 
           profile: Nexus 6
           disable-animations: true
           script: |
@@ -51,8 +53,91 @@ jobs:
             echo "Running Python Script..."
             cd SportsAppAuto && python automation.py
 
-      - name: Upload Screenshot Artifact
+      - name: Upload UI Dump Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: App-Screenshots
-          path: SportsAppAuto/*.png
+          name: App-UI-Data
+          # Yahan humne .png ki jagah .xml kar diya hai taake code file upload ho
+          path: SportsAppAuto/*.xml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==========================================================================================================
+# ================== Screenshot flags are there =======================
+# ==========================================================================================================
+
+
+
+# name: Mobile App Automation
+
+# on:
+#   push:
+#     branches: [ main ]
+#   workflow_dispatch: 
+
+# jobs:
+#   android-test:
+#     runs-on: ubuntu-latest # Wapas Ubuntu par taake fast aur KVM virtualization miley
+    
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+#         with:
+#           lfs: true 
+
+#       - name: Enable KVM group perms (Hardware Acceleration)
+#         run: |
+#           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+#           sudo udevadm control --reload-rules
+#           sudo udevadm trigger --name-match=kvm
+
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.10'
+
+#       - name: Install Appium and Dependencies
+#         run: |
+#           npm i -g appium
+#           appium driver install uiautomator2
+#           pip install Appium-Python-Client
+#           appium & 
+
+#       - name: Run Android Emulator and Execute Script
+#         uses: reactivecircus/android-emulator-runner@v2
+#         with:
+#           api-level: 30 # <--- API 30 (Android 11) jisme ARM to x86 translator mojood hai
+#           target: google_apis
+#           arch: x86_64 # <--- Server ka native architecture taake fast boot ho
+#           profile: Nexus 6
+#           disable-animations: true
+#           script: |
+#             echo "Checking APK files..."
+#             ls -lh SportsAppAuto/apks/
+            
+#             echo "Installing Split APKs (ARM Translation will activate)..."
+#             adb install-multiple SportsAppAuto/apks/base.apk SportsAppAuto/apks/split_config.arm64_v8a.apk SportsAppAuto/apks/split_config.en.apk SportsAppAuto/apks/split_config.xxhdpi.apk
+            
+#             echo "Running Python Script..."
+#             cd SportsAppAuto && python automation.py
+
+#       - name: Upload Screenshot Artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: App-Screenshots
+#           path: SportsAppAuto/*.png
